@@ -1,10 +1,13 @@
-const dbConfig = require('../config/db.config.js');
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  host: dbConfig.HOST,
-  dialect: dbConfig.dialect,
-  pool: dbConfig.pool
+// Koneksi ke database dari environment variable
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'mysql',
+  dialectOptions: {
+    ssl: {
+      rejectUnauthorized: true
+    }
+  }
 });
 
 const db = {};
@@ -14,8 +17,7 @@ db.sequelize = sequelize;
 // Import models
 db.landing = require('./landing.model.js')(sequelize, DataTypes);
 db.project = require('./project.model.js')(sequelize, Sequelize);
-db.article = require("./article.model")(sequelize, Sequelize);
-db.contact = require("./contact.model")(sequelize, Sequelize);
-
+db.article = require('./article.model')(sequelize, Sequelize);
+db.contact = require('./contact.model')(sequelize, Sequelize);
 
 module.exports = db;
